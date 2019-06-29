@@ -7,16 +7,21 @@ public class TestCase {
     public static void main(String[] args) throws FileNotFoundException {
         Fat32 fat32 = new Fat32("disco1.fat32");
         fat32.escreveTabela(24);
+        String exemplo = "tomara";
+        String exemplo2 = "q de";
+
+        fat32.append("Indice", exemplo.getBytes() );
+        fat32.append("Indice", exemplo2.getBytes() );
 
         byte[] dsads = fat32.getTABLE();
-        int pau = dsads[0];
-
-        byte[] response = fat32.read("fat", 0, 19);
-
-        String aaa = new String();
 
 
-        System.out.println(pau);
+        byte[] response = fat32.read("fat", 1, 2);
+
+        int numero = response[0];
+
+
+        System.out.println(numero);
 
 
 

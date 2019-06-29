@@ -28,5 +28,9 @@ public class Disco {
         file.write(bytes);
     }
 
+    public int getTamanhoBloco(){
+        return TAMANHO_BLOCO;
+    }
+
 
 }
