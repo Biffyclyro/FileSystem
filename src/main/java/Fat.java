@@ -22,7 +22,7 @@ public class Fat {
         if(livres.size() >= tamanhoArquivo){
             for (int livre: livres){
                 if(livres.get(livres.indexOf(livre) + 1).byteValue() == livres.size()){
-                    table[livre] = 0;
+                    table[livre] = (byte) livre;
                 }else {
                     table[livre] = livres.get(livres.indexOf(livre) + 1).byteValue();
                 }
@@ -30,8 +30,16 @@ public class Fat {
         }
 
         return livres;
+    }
 
+    public int returnLivre(){
+        int i = 0;
 
+        for (int index: table){
+            if(index != 0) i++;
+        }
+
+        return i;
 
     }
 

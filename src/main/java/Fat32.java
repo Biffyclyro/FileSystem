@@ -22,7 +22,7 @@ public class Fat32 implements FileSystem {
                 e.printStackTrace();
             }
 
-        }else {
+        } else {
 
             this.fat = new Fat( read("TabelaFat", 1, 2) );
 
@@ -112,7 +112,11 @@ public class Fat32 implements FileSystem {
 
     @Override
     public int freeSpace() {
-        return 0;
+
+        return fat.returnLivre()*disco.getTamanhoBloco();
+
+
+
     }
 
     @Override
