@@ -1,46 +1,49 @@
+import lombok.Data;
 import lombok.Setter;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.Arrays;
 
-@Setter
+@Data
 public class Arquivo {
-    private static final int NOME_LENGTH = 7;
-    private static final int EXT_LENGTH = 3;
 
-    private byte[] nome = new byte[NOME_LENGTH];
-    private byte[] ext = new byte[EXT_LENGTH];
+    private byte[] nome = new byte[Limits.NOME_LENGTH];
+    private byte[] ext = new byte[Limits.EXT_LENGTH];
     private int size;
     private int blocoInicial;
 
-
-    private Arquivo(String nome, String ext, int size) {
-        System.arraycopy(nome.getBytes(), 0, this.nome, 0, nome.length);
-        System.arraycopy(ext.getBytes(), 0, this.ext, 0, ext.length);
+    public Arquivo(String nome, String ext, int size, int blocoInicial) {
+        System.arraycopy(nome.getBytes(), 0, this.nome, 0, nome.length());
+        System.arraycopy(ext.getBytes(), 0, this.ext, 0, ext.length());
         this.size = size;
+        this.blocoInicial = blocoInicial;
     }
 
     public byte[] getBytes() {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        try {
-            bytes.write(nome);
-            bytes.write(ext, NOME_LENGTH, EXT_LENGTH);
-            bytes.write(intToByteArray(size), NOME_LENGTH+EXT_LENGTH, 4);
-            bytes.write(intToByteArray(blocoInicial), NOME_LENGTH+EXT_LENGTH+4, 4);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+            bytes.write(1);
+            bytes.write(nome, 0, Limits.NOME_LENGTH);
+            bytes.write(Utils.intToByteArray(size), 0, 4);
+            bytes.write(Utils.intToByteArray(blocoInicial), 0, 4);
 
         return bytes.toByteArray();
     }
 
-    private byte[] intToByteArray(int i) {
-        byte[] data = new byte[4];
-        data[3] = (byte) (i & 0xFF);
-        data[2] = (byte) ((i >> 8) & 0xFF);
-        data[1] = (byte) ((i >> 16) & 0xFF);
-        data[0] = (byte) ((i >> 24) & 0xFF);
-        return data;
+
+
+    Arquivo(byte[] bytes) {
+        byte[] sz = new byte[4];
+        byte[] bInicial = new byte[4];
+
+        System.arraycopy(bytes, 0, this.nome, 0, Limits.NOME_LENGTH);
+        System.arraycopy(bytes, Limits.NOME_LENGTH , this.ext, 0, Limits.EXT_LENGTH);
+        System.arraycopy(bytes, Limits.NOME_LENGTH + Limits.EXT_LENGTH , sz, 0, 4);
+        System.arraycopy(bytes, Limits.NOME_LENGTH + Limits.EXT_LENGTH + 4, bInicial, 0, 4);
+
+        this.size =  ByteBuffer.wrap(sz).getInt();
+        this.blocoInicial =  ByteBuffer.wrap(bInicial).getInt();
     }
 
 }
