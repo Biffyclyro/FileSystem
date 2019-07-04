@@ -1,12 +1,13 @@
+package com.github.biffyclyro.filesystem;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Arrays;
 
 public class TestCase {
 
 
     public static void main(String[] args) throws FileNotFoundException {
-/*        Fat32 fat32 = new Fat32("disco1.fat32");
+/*        com.github.biffyclyro.filesystem.Fat32 fat32 = new com.github.biffyclyro.filesystem.Fat32("disco1.fat32");
 
         String exemplo = "tomara";
         String exemplo2 = "q de";
@@ -29,9 +30,9 @@ public class TestCase {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Arquivo arq = null;
+        com.github.biffyclyro.filesystem.Arquivo arq = null;
         try {
-            arq = new Arquivo(disco.readBlock(0));
+            arq = new com.github.biffyclyro.filesystem.Arquivo(disco.readBlock(0));
         } catch (IOException e) {
             e.printStackTrace();
         }

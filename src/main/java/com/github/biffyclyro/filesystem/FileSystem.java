@@ -1,3 +1,5 @@
+package com.github.biffyclyro.filesystem;
+
 public interface FileSystem {
 
     /**

@@ -1,3 +1,5 @@
+package com.github.biffyclyro.filesystem;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -9,7 +11,7 @@ public class Diretorio {
     private int blocoInicial;
     private List<Arquivo> arquivos;
 
-   /* public Diretorio(byte[] diretorio) {
+   /* public com.github.biffyclyro.filesystem.Diretorio(byte[] diretorio) {
         this.diretorio = diretorio;
         var dir = "1diretorio/0";
         var fat = "0fat";

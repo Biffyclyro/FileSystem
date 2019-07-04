@@ -1,4 +1,5 @@
-import java.io.FileNotFoundException;
+package com.github.biffyclyro.filesystem;
+
 import java.io.IOException;
 
 public class Fat32 implements FileSystem {
@@ -7,6 +8,7 @@ public class Fat32 implements FileSystem {
     private Fat fat;
 
 
+/*
     public Fat32(String fileName) throws FileNotFoundException {
 
         this.disco = new Disco(fileName, NUM_BLOCOS);
@@ -29,6 +31,7 @@ public class Fat32 implements FileSystem {
         }
 
     }
+*/
 
 
 
@@ -112,11 +115,7 @@ public class Fat32 implements FileSystem {
 
     @Override
     public int freeSpace() {
-
-        return fat.returnLivre()*disco.getTamanhoBloco();
-
-
-
+        return fat.returnLivreCount()*disco.getTamanhoBloco();
     }
 
     @Override

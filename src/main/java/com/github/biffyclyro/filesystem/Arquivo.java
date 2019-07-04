@@ -1,10 +1,9 @@
+package com.github.biffyclyro.filesystem;
+
 import lombok.Data;
-import lombok.Setter;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 
 @Data
 public class Arquivo {
