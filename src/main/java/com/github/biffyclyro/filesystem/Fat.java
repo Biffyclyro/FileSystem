@@ -15,26 +15,29 @@ public class Fat {
         }
     }
 
-    public Optional<List<Integer>> alocarEspaco(int numBlocos) {
+    public List<Integer> alocarEspaco(int numBlocos) {
 
-        List<Integer> livres = new LinkedList<>();
+        List<Integer> livres = new ArrayList<>(numBlocos);
 
-        for ( Integer idx : fat ) {
-            if(idx == null && numBlocos > 0){
-                livres.add(idx);
+        for (int i = 0; i <= fat.size(); i++) {
+            if(fat.get(i) == null && numBlocos > 0){
+                livres.add(i);
                 numBlocos--;
             }
         }
-
-        for ( Integer idx : livres) {
-            livres.
-        }
-
         if ( numBlocos > 0) {
             throw new FatExption("Espaco insuficiente");
-        }
+        } else {
+            int livresLastIdx = livres.size()-1;
 
-        return Optional.of(livres);
+            fat.set(livres.get(livresLastIdx), livres.get(livresLastIdx));
+
+            for (int i = livresLastIdx - 1; i >= 0; i--) {
+                fat.set(livres.get(i), livres.get(i+1));
+            }
+
+            return livres;
+        }
     }
 
     public int returnLivreCount(){
