@@ -10,7 +10,7 @@ public class Fat {
 
     public Fat(int numBlocos) {
         this.fat = new ArrayList<>(numBlocos);
-        for (int i = numBlocos; i >= 0; i--) {
+        for (int i = 0; i < numBlocos; i++) {
             this.fat.add(null);
         }
     }
@@ -19,7 +19,7 @@ public class Fat {
 
         List<Integer> livres = new ArrayList<>(numBlocos);
 
-        for (int i = 0; i <= fat.size(); i++) {
+        for (int i = 0; i < fat.size(); i++) {
             if(fat.get(i) == null && numBlocos > 0){
                 livres.add(i);
                 numBlocos--;
@@ -43,7 +43,7 @@ public class Fat {
     public int returnLivreCount(){
         AtomicInteger i = new AtomicInteger();
 
-        fat.forEach(idx -> { if (idx == 0 ) i.getAndIncrement(); });
+        fat.forEach(idx -> { if (idx == null ) i.getAndIncrement(); });
 
         return i.get();
     }
