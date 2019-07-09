@@ -1,5 +1,6 @@
 package com.github.biffyclyro.filesystem;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class Fat32 implements FileSystem {
@@ -8,36 +9,15 @@ public class Fat32 implements FileSystem {
     private Fat fat;
 
 
-/*
     public Fat32(String fileName) throws FileNotFoundException {
-
         this.disco = new Disco(fileName, NUM_BLOCOS);
 
-        if(read("TabelaFat", 1, 2) == null){
-
-            this.fat = new Fat(new byte[NUM_BLOCOS]);
-            fat.getTable()[1] = 0;
-
-            try {
-                disco.writeBlock(fat.getTable(), 1);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-        } else {
-
-            this.fat = new Fat( read("TabelaFat", 1, 2) );
-
+        try {
+            this.fat = new Fat(disco.readBlock(0), NUM_BLOCOS);
+        } catch ( IOException e ) {
+            e.printStackTrace();
         }
-
     }
-*/
-
-
-
-
-
-
 
     @Override
     public void create(String fileName, byte[] data) {
