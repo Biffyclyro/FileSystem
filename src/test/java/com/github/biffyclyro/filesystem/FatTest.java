@@ -22,12 +22,12 @@ class FatTest {
 
     @Test
     void alocarEspaco() {
-        List esperado = Collections.singletonList(1);
+        List esperado = Collections.singletonList(2);
         List blocos = this.fat.alocarEspaco(1);
         assertIterableEquals(esperado, blocos);
 
-        esperado = IntStream.range(2,10).boxed().collect(Collectors.toList());
-        blocos = this.fat.alocarEspaco(8);
+        esperado = IntStream.range(3,10).boxed().collect(Collectors.toList());
+        blocos = this.fat.alocarEspaco(7);
         assertIterableEquals(esperado, blocos);
 
         assertThrows(FatExeption.class, () -> this.fat.alocarEspaco(1));
@@ -35,7 +35,7 @@ class FatTest {
 
     @Test
     void returnLivreCount() {
-        assertEquals(9, this.fat.returnLivreCount());
+        assertEquals(8, this.fat.returnLivreCount());
 
         this.alocarEspaco();
         assertEquals(0, this.fat.returnLivreCount());
