@@ -61,15 +61,7 @@ public class Fat {
         if ( numBlocos > 0) {
             throw new FatExeption("Espaco insuficiente");
         } else {
-            int livresLastIdx = livres.size()-1;
-
-            fat.set(livres.get(livresLastIdx), 0);
-
-            for (int i = livresLastIdx - 1; i >= 0; i--) {
-                fat.set(livres.get(i), livres.get(i+1));
-            }
-
-            return livres;
+            return ligarBlocos(livres);
         }
     }
 
@@ -106,5 +98,29 @@ public class Fat {
         fat.forEach(idx -> { if (idx == -1 ) i.getAndIncrement(); });
 
         return i.get();
+    }
+
+    public List<Integer> append(int blocoInicial, int numBlocosAdicionais) {
+        List<Integer> blocos = this.getBlocos(blocoInicial);
+        int tamInicial = blocos.size();
+
+        if ( numBlocosAdicionais > 0  ) {
+            blocos.addAll(this.alocarEspaco(numBlocosAdicionais));
+            ligarBlocos(blocos);
+        }
+
+        return blocos.subList(tamInicial - 1, blocos.size());
+    }
+
+    private List<Integer> ligarBlocos(List<Integer> lista) {
+        int ultimoIdx = lista.size()-1;
+
+        fat.set(lista.get(ultimoIdx), 0);
+
+        for (int i = ultimoIdx - 1; i >= 0; i--) {
+            fat.set(lista.get(i), lista.get(i+1));
+        }
+
+        return lista;
     }
 }

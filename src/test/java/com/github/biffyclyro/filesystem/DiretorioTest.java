@@ -1,5 +1,6 @@
 package com.github.biffyclyro.filesystem;
 
+import com.github.biffyclyro.filesystem.diretorio.Diretorio;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -13,9 +14,9 @@ class DiretorioTest {
 
     @Test
     void getBytes() {
-    }
+        Diretorio d = new Diretorio("teste", 0);
+        byte[] bytes = d.getBytes();
 
-    @Test
-    void leDiretorio() {
+        assertEquals(d.getNome(), new Diretorio(bytes).getNome());
     }
 }

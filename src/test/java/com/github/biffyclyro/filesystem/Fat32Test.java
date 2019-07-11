@@ -27,12 +27,11 @@ class Fat32Test {
     void create() {
         assertDoesNotThrow(() -> this.fat32.create("teste.txt", "teste123sdasd".getBytes()));
 
-        StringBuilder multiBlocos = new StringBuilder();
-        multiBlocos.append("1".repeat(Disco.TAMANHO_BLOCO));
-        multiBlocos.append("A".repeat(Disco.TAMANHO_BLOCO));
+        String multiBlocos = "1".repeat(Disco.TAMANHO_BLOCO) +
+                "2".repeat(Disco.TAMANHO_BLOCO);
 
         assertDoesNotThrow(() ->
-                this.fat32.create("teste2.txt", String.valueOf(multiBlocos).getBytes())); // asserção escrevendo dois blocos
+                this.fat32.create("teste2.txt", multiBlocos.getBytes())); // asserção escrevendo dois blocos
     }
 
     @Test
@@ -41,11 +40,11 @@ class Fat32Test {
         this.fat32.create("teste3.txt", dado.getBytes());
         assertEquals(dado, new String(this.fat32.read("teste3.txt",0, dado.length())));
 
-        StringBuilder multiBlocos = new StringBuilder();
-        multiBlocos.append("1".repeat(Disco.TAMANHO_BLOCO));
-        multiBlocos.append("A".repeat(Disco.TAMANHO_BLOCO));
-        this.fat32.create("teste2.txt", String.valueOf(multiBlocos).getBytes());
-        assertEquals(multiBlocos.toString(), new String(this.fat32.read("teste2.txt",0, multiBlocos.length())));
+        String multiBlocos = "1".repeat(Disco.TAMANHO_BLOCO) +
+                "2".repeat(Disco.TAMANHO_BLOCO);
+
+        this.fat32.create("teste2.txt", multiBlocos.getBytes());
+        assertEquals(multiBlocos, new String(this.fat32.read("teste2.txt",0, multiBlocos.length())));
     }
 
     @Test
@@ -55,7 +54,17 @@ class Fat32Test {
 
     @Test
     void append() {
-        fail("Não implementado");
+        String bloco1 = "1".repeat(Disco.TAMANHO_BLOCO +1);
+        String bloco2 = "2".repeat(Disco.TAMANHO_BLOCO -1);
+
+        this.fat32.create("tAppend.txt", bloco1.getBytes());
+        this.fat32.append("tAppend.txt", bloco2.getBytes());
+
+        StringBuilder tudo = new StringBuilder(bloco1);
+        tudo.append(bloco2);
+
+        assertEquals(tudo.toString(),
+                new String(this.fat32.read("tAppend.txt", 0, tudo.toString().length())));
     }
 
     @Test
@@ -68,7 +77,8 @@ class Fat32Test {
 
     @Test
     void freeSpace() {
-        fail("Não implementado");
+        // -2 blocos(fat e diretorio root)
+        assertEquals(Disco.TAMANHO_BLOCO * (Fat32.NUM_BLOCOS - 2) , this.fat32.freeSpace());
     }
 
     @Test

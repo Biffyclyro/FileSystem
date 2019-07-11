@@ -30,7 +30,7 @@
   - 3 bytes para extensão
   
   - [x] ler
-  - [ ] adicionar
+  - [x] adicionar
   - [x] escrever
   - [x] remover
   

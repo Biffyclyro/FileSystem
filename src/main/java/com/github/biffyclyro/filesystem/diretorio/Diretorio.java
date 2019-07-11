@@ -1,10 +1,12 @@
 package com.github.biffyclyro.filesystem.diretorio;
 
+import com.github.biffyclyro.filesystem.Utils;
+
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -15,6 +17,7 @@ public class Diretorio extends EntradaDiretorio {
         this.nome = nome;
         this.isDiretorio = true;
         this.blocoInicial = blocoInicial;
+        this.tamanho = 0;
     }
 
     public byte[] getBytes() {
@@ -22,16 +25,17 @@ public class Diretorio extends EntradaDiretorio {
 
         bytes.write(isDiretorio ? 1 : 0);
         try {
-            bytes.write(ByteBuffer.allocate(8).put(this.nome.getBytes(StandardCharsets.US_ASCII)).array());
+            bytes.write(ByteBuffer.allocate(11).put(this.nome.getBytes()).array());
+            bytes.write(Utils.intToByteArray(tamanho));
+            bytes.write(Utils.intToByteArray(blocoInicial));
         } catch ( IOException e ) {
             e.printStackTrace();
         }
-        bytes.write(ByteBuffer.allocate(4).putInt(blocoInicial).array(), 0, 4);
 
-        if (arquivos != null) {
+        if ( arquivos.size() > 0 ) {
             arquivos.forEach(arq -> {
                 try {
-                    bytes.write(arq.getBytes());
+                    bytes.write(arq.toByteArray());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -42,7 +46,19 @@ public class Diretorio extends EntradaDiretorio {
     }
 
     public void addEntrada(Arquivo a) {
-        this.arquivos.add(a);
+        try {
+            getEntrada(a.getNome());
+            throw new IllegalArgumentException(a.getNome() + " ja existe");
+        } catch ( FileNotFoundException e ) {
+            this.arquivos.add(a);
+            this.tamanho++;
+        }
+    }
+
+    public void modEntrada(Arquivo a) throws FileNotFoundException {
+        int idx = this.arquivos.indexOf(this.getEntrada(a.getNome()));
+
+        this.arquivos.set(idx, a);
     }
 
     public String list() {
@@ -50,7 +66,9 @@ public class Diretorio extends EntradaDiretorio {
 
         arquivos.forEach( idx -> {
             str.append(idx.getNome());
-            if ( idx.isDiretorio ) str.append("/");
+            if ( idx.isDiretorio ) {
+                str.append("/");
+            }
             str.append('\n');
         });
 
@@ -58,7 +76,9 @@ public class Diretorio extends EntradaDiretorio {
     }
 
     public void rmEntrada(String nome) throws FileNotFoundException {
-        this.arquivos.remove(this.getEntrada(nome));
+        if ( this.arquivos.remove(this.getEntrada(nome)) ) {
+            this.tamanho--;
+        }
     }
 
     public Arquivo getEntrada(String nome) throws FileNotFoundException {
@@ -70,16 +90,25 @@ public class Diretorio extends EntradaDiretorio {
         throw new FileNotFoundException("Arquivo com nome: " + nome + " nao encontrado");
     }
 
-//    Diretorio(byte[] bytes) {
-//        byte[] bInicial = new byte[4];
-//
-//        System.arraycopy(bytes, 0, this.nome, 0, Limits.NOME_LENGTH);
-//        System.arraycopy(bytes, Limits.NOME_LENGTH, bInicial, 0, 4);
-//
-//        this.blocoInicial =  ByteBuffer.wrap(bInicial).getInt();
-//
-//        for (int i = Limits.NOME_LENGTH + 4; i <= bytes.length; i += 18 ) {
-//            arquivos.add(new Arquivo(Arrays.copyOfRange(bytes, i , i+18)));
-//        }
-//    }
+    public Diretorio(byte[] bytes) {
+        ByteArrayInputStream bIn = new ByteArrayInputStream(bytes);
+
+        if ( bIn.read() != 0 ) {
+            this.isDiretorio = true;
+        } else {
+            throw new IllegalArgumentException("Dado não é um diretorio");
+        }
+
+        try {
+            this.nome         = new String(bIn.readNBytes(11)).trim();
+            this.tamanho      = Utils.byteArrayToInt(bIn.readNBytes(4));
+            this.blocoInicial = Utils.byteArrayToInt(bIn.readNBytes(4));
+
+            for ( int i = tamanho; i > 0; i-- ) {
+                this.arquivos.add(new Arquivo(bIn.readNBytes(20)));
+            }
+        } catch ( IOException e ) {
+            e.printStackTrace();
+        }
+    }
 }
