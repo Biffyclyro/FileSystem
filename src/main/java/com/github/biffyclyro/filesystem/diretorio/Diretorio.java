@@ -11,13 +11,35 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class Diretorio extends EntradaDiretorio {
-    private List<Arquivo> arquivos = new LinkedList<>();
+    private List<EntradaDiretorio> arquivos = new LinkedList<>();
 
     public Diretorio(String nome, int blocoInicial) {
         this.nome = nome;
         this.isDiretorio = true;
         this.blocoInicial = blocoInicial;
         this.tamanho = 0;
+    }
+
+    public Diretorio(byte[] bytes) {
+        ByteArrayInputStream bIn = new ByteArrayInputStream(bytes);
+
+        if ( bIn.read() != 0 ) {
+            this.isDiretorio = true;
+        } else {
+            throw new IllegalArgumentException("Dado não é um diretorio");
+        }
+
+        try {
+            this.nome         = new String(bIn.readNBytes(11)).trim();
+            this.tamanho      = Utils.byteArrayToInt(bIn.readNBytes(4));
+            this.blocoInicial = Utils.byteArrayToInt(bIn.readNBytes(4));
+
+            for ( int i = tamanho; i > 0; i-- ) {
+                this.arquivos.add(new Arquivo(bIn.readNBytes(20)));
+            }
+        } catch ( IOException e ) {
+            e.printStackTrace();
+        }
     }
 
     public byte[] getBytes() {
@@ -45,20 +67,20 @@ public class Diretorio extends EntradaDiretorio {
         return bytes.toByteArray();
     }
 
-    public void addEntrada(Arquivo a) {
+    public void addEntrada(EntradaDiretorio ed) {
         try {
-            getEntrada(a.getNome());
-            throw new IllegalArgumentException(a.getNome() + " ja existe");
+            getEntrada(ed.getNome());
+            throw new IllegalArgumentException(ed.getNome() + " ja existe");
         } catch ( FileNotFoundException e ) {
-            this.arquivos.add(a);
+            this.arquivos.add(ed);
             this.tamanho++;
         }
     }
 
-    public void modEntrada(Arquivo a) throws FileNotFoundException {
-        int idx = this.arquivos.indexOf(this.getEntrada(a.getNome()));
+    public void modEntrada(EntradaDiretorio e) throws FileNotFoundException {
+        int idx = this.arquivos.indexOf(this.getEntrada(e.getNome()));
 
-        this.arquivos.set(idx, a);
+        this.arquivos.set(idx, e);
     }
 
     public String list() {
@@ -81,34 +103,12 @@ public class Diretorio extends EntradaDiretorio {
         }
     }
 
-    public Arquivo getEntrada(String nome) throws FileNotFoundException {
-        for ( Arquivo a : this.arquivos ) {
-            if ( a.getNome().equals(nome) ) {
-                return a;
+    public EntradaDiretorio getEntrada(String nome) throws FileNotFoundException {
+        for ( EntradaDiretorio e : this.arquivos ) {
+            if ( e.getNome().equals(nome) ) {
+                return e;
             }
         }
         throw new FileNotFoundException("Arquivo com nome: " + nome + " nao encontrado");
-    }
-
-    public Diretorio(byte[] bytes) {
-        ByteArrayInputStream bIn = new ByteArrayInputStream(bytes);
-
-        if ( bIn.read() != 0 ) {
-            this.isDiretorio = true;
-        } else {
-            throw new IllegalArgumentException("Dado não é um diretorio");
-        }
-
-        try {
-            this.nome         = new String(bIn.readNBytes(11)).trim();
-            this.tamanho      = Utils.byteArrayToInt(bIn.readNBytes(4));
-            this.blocoInicial = Utils.byteArrayToInt(bIn.readNBytes(4));
-
-            for ( int i = tamanho; i > 0; i-- ) {
-                this.arquivos.add(new Arquivo(bIn.readNBytes(20)));
-            }
-        } catch ( IOException e ) {
-            e.printStackTrace();
-        }
     }
 }

@@ -48,11 +48,6 @@ class Fat32Test {
     }
 
     @Test
-    void createDir() {
-        fail("Não implementado");
-    }
-
-    @Test
     void append() {
         String bloco1 = "1".repeat(Disco.TAMANHO_BLOCO +1);
         String bloco2 = "2".repeat(Disco.TAMANHO_BLOCO -1);
@@ -70,7 +65,6 @@ class Fat32Test {
     @Test
     void remove() {
         this.create();
-        System.out.println(this.fat32.listFiles());
         this.fat32.remove("teste.txt");
         assertArrayEquals(new byte[0], this.fat32.read("teste.txt",0, 10));
     }
@@ -90,6 +84,12 @@ class Fat32Test {
     }
 
     @Test
+    void createDir() {
+        this.fat32.createDir("teste");
+        assertEquals("teste/"+'\n', this.fat32.listFiles());
+    }
+
+    @Test
     void persistencia() throws IOException {
         String dado = "abc";
 
@@ -98,5 +98,26 @@ class Fat32Test {
         String teste = new String(new Fat32("discoTeste").read("teste.abc", 0, -1));
 
         assertEquals(dado, teste);
+    }
+
+    @Test
+    void createWithDir() {
+        this.fat32.createDir("teste");
+        assertDoesNotThrow(() -> this.fat32.createWithDir("teste/teste.txt", "testezinho".getBytes()));
+    }
+
+    @Test
+    void readWithDir() {
+        String dado = "teste";
+
+        String dado2 = "teste".repeat(Disco.TAMANHO_BLOCO * 2);
+
+        this.fat32.createDir("teste");
+        this.fat32.createWithDir("teste/teste.txt", dado.getBytes());
+
+        this.fat32.createWithDir("teste/teste2.txt", dado2.getBytes());
+
+        assertEquals(dado, new String(this.fat32.readWithDir("teste/teste.txt", 0, -1)));
+        assertEquals(dado2, new String(this.fat32.readWithDir("teste/teste2.txt", 0, -1)));
     }
 }

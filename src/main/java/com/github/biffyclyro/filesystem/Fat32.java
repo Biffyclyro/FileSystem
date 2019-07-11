@@ -2,6 +2,7 @@ package com.github.biffyclyro.filesystem;
 
 import com.github.biffyclyro.filesystem.diretorio.Arquivo;
 import com.github.biffyclyro.filesystem.diretorio.Diretorio;
+import com.github.biffyclyro.filesystem.diretorio.EntradaDiretorio;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -56,22 +57,10 @@ public class Fat32 implements FileSystem {
         this.update();
     }
 
-
-    public void createDir(String dirName) {
-        int bloco = this.fat.alocarEspaco(1).get(0);
-        Diretorio root = new Diretorio(dirName, bloco);
-        try {
-            this.disco.writeBlock(root.toByteArray(), bloco);
-            this.disco.writeBlock(fat.getBytes(), 1);
-        } catch ( IOException e ) {
-            e.printStackTrace();
-        }
-    }
-
     @Override
     public void append(String fileName, byte[] data) {
         try {
-            Arquivo arquivo = this.root.getEntrada(fileName);
+            EntradaDiretorio arquivo = this.root.getEntrada(fileName);
             if ( arquivo.isDiretorio() ) {
                 return;
             }
@@ -107,7 +96,6 @@ public class Fat32 implements FileSystem {
             }
 
             this.update();
-
         } catch ( IOException e ) {
             e.printStackTrace();
         }
@@ -116,10 +104,10 @@ public class Fat32 implements FileSystem {
     @Override
     public byte[] read(String fileName, int offset, int limit) {
         try {
-            Arquivo a = this.root.getEntrada(fileName);
+            EntradaDiretorio ed = this.root.getEntrada(fileName);
 
-            List<Integer> blocos = this.fat.getBlocos(a.getBlocoInicial());
-            ByteBuffer buffer = ByteBuffer.allocate(getNumBlocos(a.getTamanho()) * Disco.TAMANHO_BLOCO );
+            List<Integer> blocos = this.fat.getBlocos(ed.getBlocoInicial());
+            ByteBuffer buffer = ByteBuffer.allocate(getNumBlocos(ed.getTamanho()) * Disco.TAMANHO_BLOCO );
 
             blocos.forEach(b -> {
                 try {
@@ -130,7 +118,7 @@ public class Fat32 implements FileSystem {
             });
 
             if ( limit == -1 ) {
-                limit = a.getTamanho();
+                limit = ed.getTamanho();
             }
             ByteArrayInputStream bOut = new ByteArrayInputStream(buffer.array(), offset, limit);
 
@@ -168,6 +156,15 @@ public class Fat32 implements FileSystem {
         }
     }
 
+    private void update(Diretorio d) {
+        try {
+            disco.writeBlock(d.getBytes(), d.getBlocoInicial());
+            disco.writeBlock(this.fat.getBytes(), 1);
+        } catch ( IOException e ) {
+            e.printStackTrace();
+        }
+    }
+
     private static int getNumBlocos(byte[] bytes) {
         return getNumBlocos(bytes.length);
     }
@@ -195,4 +192,91 @@ public class Fat32 implements FileSystem {
         }
         return l;
     }
+
+    // -------------------------------------------------- Bonus
+
+    public void createWithDir(String fileName, byte[] data) {
+        String[] caminho = fileName.split("/");
+
+        try {
+            Diretorio dir = this.getDiretorioFromEntry(this.root.getEntrada(caminho[0]));
+
+            int numBlocos = getNumBlocos(data);
+            List<Integer> blocos = this.fat.alocarEspaco(numBlocos);
+
+            Arquivo a = new Arquivo(caminho[1], data.length, blocos.get(0), false);
+
+            dir.addEntrada(a);
+
+            List<byte[]> dados = splitByteArray(data);
+
+            for ( int i = 0 ; i < numBlocos; i++ ) {
+                disco.writeBlock(dados.get(i), blocos.get(i));
+            }
+
+            this.update(dir);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public byte[] readWithDir(String fileName, int offset, int limit) {
+        String[] caminho = fileName.split("/");
+
+        try {
+            Diretorio dir = this.getDiretorioFromEntry(this.root.getEntrada(caminho[0]));
+
+            EntradaDiretorio ed = dir.getEntrada(caminho[1]);
+
+            List<Integer> blocos = this.fat.getBlocos(ed.getBlocoInicial());
+            ByteBuffer buffer = ByteBuffer.allocate(getNumBlocos(ed.getTamanho()) * Disco.TAMANHO_BLOCO );
+
+            blocos.forEach(b -> {
+                try {
+                    buffer.put(disco.readBlock(b));
+                } catch ( IOException e ) {
+                    e.printStackTrace();
+                }
+            });
+
+            if ( limit == -1 ) {
+                limit = ed.getTamanho();
+            }
+            ByteArrayInputStream bOut = new ByteArrayInputStream(buffer.array(), offset, limit);
+
+            return bOut.readAllBytes();
+        } catch ( IOException ex ) {
+            return new byte[0];
+        }
+    }
+
+
+    public void createDir(String dirName) {
+
+        int bloco = this.fat.alocarEspaco(1).get(0);
+        Diretorio dir = new Diretorio(dirName, bloco);
+
+        try {
+            this.disco.writeBlock(dir.toByteArray(), bloco);
+            this.root.addEntrada(dir);
+
+            this.update();
+        } catch ( IOException e ) {
+            e.printStackTrace();
+        }
+    }
+
+    private Diretorio getDiretorioFromEntry(EntradaDiretorio e) {
+        if ( !e.isDiretorio() ) {
+            throw new IllegalArgumentException("Não e um diretorio");
+        }
+        try {
+            byte[] blocos = this.disco.readBlock(e.getBlocoInicial());
+            return new Diretorio(blocos);
+        } catch ( IOException ex ) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
 }

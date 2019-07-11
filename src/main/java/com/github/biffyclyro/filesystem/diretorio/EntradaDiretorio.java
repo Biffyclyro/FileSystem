@@ -12,7 +12,6 @@ public abstract class EntradaDiretorio {
     int tamanho;
     int blocoInicial;
 
-
     public String getNome() {
         return nome;
     }
