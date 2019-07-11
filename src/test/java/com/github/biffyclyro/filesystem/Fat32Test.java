@@ -36,7 +36,7 @@ class Fat32Test {
         multiBlocos.append("1".repeat(Disco.TAMANHO_BLOCO));
         multiBlocos.append("A".repeat(Disco.TAMANHO_BLOCO));
         this.fat32.create("teste2.txt", String.valueOf(multiBlocos).getBytes());
-        assertEquals(multiBlocos, new String(this.fat32.read("teste2.txt",0, multiBlocos.length())));
+        assertEquals(multiBlocos.toString(), new String(this.fat32.read("teste2.txt",0, multiBlocos.length())));
     }
 
     @Test
