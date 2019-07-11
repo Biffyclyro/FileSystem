@@ -119,7 +119,7 @@ public class Fat32 implements FileSystem {
             Arquivo a = this.root.getEntrada(fileName);
 
             List<Integer> blocos = this.fat.getBlocos(a.getBlocoInicial());
-            ByteBuffer buffer = ByteBuffer.allocate(getNumBlocos(a.getTamanho()) * Disco.TAMANHO_BLOCO + 1 );
+            ByteBuffer buffer = ByteBuffer.allocate(getNumBlocos(a.getTamanho()) * Disco.TAMANHO_BLOCO );
 
             blocos.forEach(b -> {
                 try {
@@ -129,6 +129,9 @@ public class Fat32 implements FileSystem {
                 }
             });
 
+            if ( limit == -1 ) {
+                limit = a.getTamanho();
+            }
             ByteArrayInputStream bOut = new ByteArrayInputStream(buffer.array(), offset, limit);
 
             return bOut.readAllBytes();
