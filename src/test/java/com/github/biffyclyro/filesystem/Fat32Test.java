@@ -88,4 +88,15 @@ class Fat32Test {
         this.fat32.create("teste.txt", "1".getBytes());
         assertEquals("teste.txt" + '\n', this.fat32.listFiles());
     }
+
+    @Test
+    void persistencia() throws IOException {
+        String dado = "abc";
+
+        this.fat32.create("teste.abc", dado.getBytes());
+
+        String teste = new String(new Fat32("discoTeste").read("teste.abc", 0, -1));
+
+        assertEquals(dado, teste);
+    }
 }

@@ -161,7 +161,7 @@ public class Fat32 implements FileSystem {
 
     private void update() {
         try {
-            disco.writeBlock(this.root.toByteArray(), 0);
+            disco.writeBlock(this.root.getBytes(), 0);
             disco.writeBlock(this.fat.getBytes(), 1);
         } catch ( IOException e ) {
             e.printStackTrace();

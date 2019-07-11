@@ -17,7 +17,7 @@ public class Arquivo extends EntradaDiretorio {
         final ByteArrayInputStream byteInStream = new ByteArrayInputStream(bytes);
 
         this.isDiretorio  = byteInStream.read() != 0;
-        this.nome         = new String(byteInStream.readNBytes(11));
+        this.nome         = new String(byteInStream.readNBytes(11)).trim();
         this.tamanho      = Utils.byteArrayToInt(byteInStream.readNBytes(4));
         this.blocoInicial = Utils.byteArrayToInt(byteInStream.readNBytes(4));
     }
