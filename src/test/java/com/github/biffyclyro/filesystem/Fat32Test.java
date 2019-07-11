@@ -1,7 +1,10 @@
 package com.github.biffyclyro.filesystem;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
+import java.io.File;
 import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -12,6 +15,12 @@ class Fat32Test {
     @BeforeEach
     void setUp() throws IOException {
         this.fat32 = new Fat32("discoTeste");
+    }
+
+    @AfterEach
+    void cleanUp () {
+        File disco = new File("discoTeste");
+        disco.delete();
     }
 
     @Test
@@ -66,7 +75,7 @@ class Fat32Test {
     void listFiles() {
         assertEquals("", this.fat32.listFiles());
 
-        this.fat32.create("teste.txt", "".getBytes());
+        this.fat32.create("teste.txt", "1".getBytes());
         assertEquals("teste.txt" + '\n', this.fat32.listFiles());
     }
 }
