@@ -8,7 +8,7 @@ public class Disco {
 
     private RandomAccessFile file;
     private final int NUM_BLOCOS;
-    private static final int TAMANHO_BLOCO = 64 * 1024;
+    public static final int TAMANHO_BLOCO = 64 * 1024;
 
     public Disco(String nomeArquivo, int numBlocos) throws FileNotFoundException {
         this.file = new RandomAccessFile(nomeArquivo, "rw");

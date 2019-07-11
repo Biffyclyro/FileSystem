@@ -1,6 +1,6 @@
 package com.github.biffyclyro.filesystem;
 
-import com.github.biffyclyro.filesystem.Exeception.FatExption;
+import com.github.biffyclyro.filesystem.exeception.FatExeption;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -30,7 +30,7 @@ class FatTest {
         blocos = this.fat.alocarEspaco(8);
         assertIterableEquals(esperado, blocos);
 
-        assertThrows(FatExption.class, () -> this.fat.alocarEspaco(1));
+        assertThrows(FatExeption.class, () -> this.fat.alocarEspaco(1));
     }
 
     @Test
@@ -44,7 +44,7 @@ class FatTest {
     @Test
     void getBytes() {
         byte[] currentFat = this.fat.getBytes();
-        Fat newFat = new Fat(this.fat.getBytes(), NUMBLOCOS);
+        Fat newFat = Fat.fatBuilder(this.fat.getBytes(), NUMBLOCOS);
 
         assertArrayEquals(currentFat, newFat.getBytes());
     }

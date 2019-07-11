@@ -1,6 +1,6 @@
 package com.github.biffyclyro.filesystem;
 
-import com.github.biffyclyro.filesystem.Exeception.FatExption;
+import com.github.biffyclyro.filesystem.exeception.FatExeption;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.BufferUnderflowException;
@@ -10,6 +10,21 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class Fat {
     private List<Integer> fat;
+
+
+    public static Fat fatBuilder(byte[] bytes, int numBlocos) {
+        ByteBuffer byteBuffer = ByteBuffer.wrap(bytes);
+
+        byte[] headerBytes = new byte[3];
+        byteBuffer.get(headerBytes, 0, 3);
+        String header = new String(headerBytes);
+
+        if ( header.equals("fat") ) {
+            return new Fat(byteBuffer, numBlocos);
+        } else {
+            return new Fat(numBlocos);
+        }
+    }
 
     public Fat(int numBlocos) {
         this.fat = new ArrayList<>(numBlocos);
@@ -21,23 +36,14 @@ public class Fat {
         this.fat.set(1, 0); // Fat no bloco 1
     }
 
-    public Fat(byte[] bytes, int numBlocos) {
-        ByteBuffer buffer = ByteBuffer.wrap(bytes);
-
-        byte[] headerBytes = new byte[3];
-        buffer.get(headerBytes, 0, 3);
-        String header = new String(headerBytes);
-
-        if ( header.equals("fat") ) {
-            this.fat = new ArrayList<>(numBlocos);
-            try {
-                while ( buffer.hasRemaining() ) {
-                    int i = buffer.getInt();
-                    this.fat.add(i);
-                }
-            } catch ( BufferUnderflowException ignored ) {
-
+    private Fat(ByteBuffer byteBuffer, int numBlocos) {
+        this.fat = new ArrayList<>(numBlocos);
+        try {
+            while ( byteBuffer.hasRemaining() ) {
+                int i = byteBuffer.getInt();
+                this.fat.add(i);
             }
+        } catch ( BufferUnderflowException ignored ) {
         }
     }
 
@@ -51,8 +57,9 @@ public class Fat {
                 numBlocos--;
             }
         }
+
         if ( numBlocos > 0) {
-            throw new FatExption("Espaco insuficiente");
+            throw new FatExeption("Espaco insuficiente");
         } else {
             int livresLastIdx = livres.size()-1;
 

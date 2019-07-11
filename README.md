@@ -1,4 +1,4 @@
-# com.github.biffyclyro.filesystem.FileSystem
+# FileSystem
 
 
  - O primeiro bloco será reservado para as informações do diretório (único), dentre as quais:
@@ -15,25 +15,25 @@
     A implementação completa do trabalho garante 1 (um) ponto extra na 2a nota do
     Semestre.
     
-  - [x] com.github.biffyclyro.filesystem.Fat
+  - [x] Fat
     
-  # com.github.biffyclyro.filesystem.Diretorio
+  # Diretorio
   
-  - [ ] criar diretório
-  - [ ] ler entrada do diretório
+  - [x] criar diretório
+  - [x] ler entrada do diretório
   - [ ] n niveis de diretorio
-  - [ ] listar
+  - [x] listar
   
-  # com.github.biffyclyro.filesystem.Arquivo
+  # Arquivo
   
-  - 7 bytes para nome
+  - 8 bytes para nome
   - 3 bytes para extensão
   
-  - [ ] ler
+  - [x] ler
   - [ ] adicionar
-  - [ ] escrever
-  - [ ] remover
+  - [x] escrever
+  - [x] remover
   
-  # com.github.biffyclyro.filesystem.Disco
+  # Disco
   
   - [x] mostrar espaço livre
